@@ -1,0 +1,30 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+bin/
+__debug_bin
+*.sqlite
+.env
+.env.*
+
+.idea
+.vscode
+
+.air.toml
+
+tmp/
+
+config/*.yml
+
+# Allow
+!config/example.yml

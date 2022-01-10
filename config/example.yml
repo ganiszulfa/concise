@@ -1,0 +1,28 @@
+# Service configurations
+service:
+  name: "concise-example"
+  loglevel: 6 # 0 (panic) - 6 (trace)
+  debug: true
+
+# HTTPServer configurations
+httpserver:
+  host: "localhost"
+  port: 8080
+
+# Database credentials
+database:
+  user: "postgres"
+  pass: "postgres"
+  host: "localhost"
+  db: "concise"
+  port: 5432
+  loglevel: 4 # 1 (silent) - 4 (info)
+  maxidlecon: 10
+  maxopencon: 20
+  conmaxlifetime: 3600 # in seconds
+
+
+# jwt secret key
+jwt:
+  secretkey: "secret"
+  age: 720000 # in seconds
