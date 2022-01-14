@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ganiszulfa/concise/backend/config"
 	"github.com/ganiszulfa/concise/backend/internal/http"
@@ -12,6 +14,7 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 
 	var env string
 	flag.StringVar(&env,

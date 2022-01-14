@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/gosimple/slug v1.12.0
 	github.com/graphql-go/graphql v0.8.0
 	github.com/graphql-go/handler v0.2.3
 	github.com/sirupsen/logrus v1.8.1
@@ -14,6 +15,7 @@ require (
 )
 
 require (
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

@@ -15,7 +15,7 @@ var errMsgInputInvalid = "input is invalid"
 func GetById(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
 
-	id, ok := args["key"].(int)
+	id, ok := args["id"].(int)
 	if !ok {
 		return models.Metadata{}, errors.New(errMsgInputInvalid)
 	}
@@ -59,6 +59,15 @@ func GetList(ctx context.Context, args map[string]interface{}) (mds []models.Met
 
 func Create(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
+
+	user, ok := users.GetUserFromCtx(ctx)
+	if !ok {
+		return models.Metadata{}, errors.New("login is required")
+	}
+
+	if !user.IsOwner {
+		return models.Metadata{}, errors.New("forbidden")
+	}
 
 	key, ok := args["key"].(string)
 	if !ok {

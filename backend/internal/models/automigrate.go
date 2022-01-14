@@ -5,7 +5,11 @@ import (
 )
 
 func AutoMigrateAllTables(db *gorm.DB) {
-	err := db.AutoMigrate(User{}, Metadata{})
+	err := db.AutoMigrate(
+		User{},
+		Metadata{},
+		Post{},
+	)
 	if err != nil {
 		panic(err)
 	}
