@@ -5,11 +5,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ganiszulfa/concise/config/app"
-	"github.com/ganiszulfa/concise/internal/models"
-	"github.com/ganiszulfa/concise/pkg/pwd"
-	"github.com/ganiszulfa/concise/pkg/trace"
-	"github.com/ganiszulfa/concise/pkg/validator"
+	"github.com/ganiszulfa/concise/backend/config/app"
+	"github.com/ganiszulfa/concise/backend/internal/models"
+	"github.com/ganiszulfa/concise/backend/pkg/pwd"
+	"github.com/ganiszulfa/concise/backend/pkg/trace"
+	"github.com/ganiszulfa/concise/backend/pkg/validator"
 )
 
 var errMsgInputInvalid = "input is invalid"

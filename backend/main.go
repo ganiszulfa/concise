@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ganiszulfa/concise/config"
-	"github.com/ganiszulfa/concise/internal/http"
+	"github.com/ganiszulfa/concise/backend/config"
+	"github.com/ganiszulfa/concise/backend/internal/http"
 	log "github.com/sirupsen/logrus"
 )
 

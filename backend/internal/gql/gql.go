@@ -3,7 +3,7 @@ package gql
 import (
 	"reflect"
 
-	"github.com/ganiszulfa/concise/pkg/trace"
+	"github.com/ganiszulfa/concise/backend/pkg/trace"
 	"github.com/graphql-go/graphql"
 )
 

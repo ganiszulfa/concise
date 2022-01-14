@@ -1,7 +1,7 @@
 package gql
 
 import (
-	"github.com/ganiszulfa/concise/internal/users"
+	"github.com/ganiszulfa/concise/backend/internal/users"
 	"github.com/graphql-go/graphql"
 )
 

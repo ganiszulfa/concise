@@ -1,7 +1,7 @@
 package trace
 
 import (
-	"github.com/ganiszulfa/concise/pkg/inspect"
+	"github.com/ganiszulfa/concise/backend/pkg/inspect"
 	log "github.com/sirupsen/logrus"
 )
 

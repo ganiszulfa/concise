@@ -1,6 +1,6 @@
 package inspect_test
 
-import "github.com/ganiszulfa/concise/pkg/inspect"
+import "github.com/ganiszulfa/concise/backend/pkg/inspect"
 
 func ExampleDo() {
 	var1 := "string"

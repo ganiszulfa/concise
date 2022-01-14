@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ganiszulfa/concise/internal/models"
-	"github.com/ganiszulfa/concise/pkg/trace"
+	"github.com/ganiszulfa/concise/backend/internal/models"
+	"github.com/ganiszulfa/concise/backend/pkg/trace"
 	"github.com/golang-jwt/jwt"
 )
 

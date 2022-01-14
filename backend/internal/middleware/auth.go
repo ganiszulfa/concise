@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/ganiszulfa/concise/internal/users"
-	"github.com/ganiszulfa/concise/pkg/trace"
+	"github.com/ganiszulfa/concise/backend/internal/users"
+	"github.com/ganiszulfa/concise/backend/pkg/trace"
 )
 
 func Authorize(nextHandler http.HandlerFunc) http.HandlerFunc {
