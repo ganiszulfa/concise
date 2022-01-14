@@ -9,6 +9,3 @@ type Metadata struct {
 	Key       string    `json:"key" gorm:"unique"`
 	Value     string    `json:"value"`
 }
-
-var KEY_SITE_NAME = "site name"
-var KEY_OWNER_PASSWORD = "owner password"
