@@ -17,6 +17,12 @@ var UserType = graphql.NewObject(
 			"id": &graphql.Field{
 				Type: graphql.Int,
 			},
+			"createdAt": &graphql.Field{
+				Type: graphql.DateTime,
+			},
+			"updatedAt": &graphql.Field{
+				Type: graphql.DateTime,
+			},
 			"email": &graphql.Field{
 				Type: graphql.String,
 			},

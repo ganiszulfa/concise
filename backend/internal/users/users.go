@@ -117,8 +117,12 @@ func Update(ctx context.Context, args map[string]interface{}) (user models.User,
 	}
 
 	email, ok := args["email"].(string)
-	if ok && validator.IsNotValidEmail(email) {
+	if ok && validator.IsValidEmail(email) {
 		user.Email = email
+	}
+
+	if validator.IsNotValidEmail(email) {
+		return models.User{}, errors.New(errMsgInputInvalid)
 	}
 
 	password, ok := args["password"].(string)
