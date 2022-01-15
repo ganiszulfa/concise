@@ -126,6 +126,28 @@ func Update(ctx context.Context, args map[string]interface{}) (post models.Post,
 	return post, result.Error
 }
 
+func Delete(ctx context.Context, args map[string]interface{}) (post models.Post, err error) {
+	trace.Func()
+
+	user, ok := users.GetUserFromCtx(ctx)
+	if !ok {
+		return models.Post{}, errors.New("login is required")
+	}
+
+	post, err = GetBySlug(ctx, args)
+	if err != nil {
+		return post, err
+	}
+
+	if user.Id != post.AuthorID {
+		return models.Post{}, errors.New("forbidden")
+	}
+
+	result := app.DB.Delete(&post)
+
+	return post, result.Error
+}
+
 func generateSafePostSlug(s string) string {
 	i := 10 * 1000
 	r := fmt.Sprintf("_%d", rand.Intn(i*10)+i)

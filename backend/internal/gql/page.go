@@ -96,6 +96,9 @@ var pageMutationFields = graphql.Fields{
 		Type:        PageType,
 		Description: "Update page by slug",
 		Args: graphql.FieldConfigArgument{
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"title": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
@@ -105,6 +108,19 @@ var pageMutationFields = graphql.Fields{
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return pages.Update(p.Context, p.Args)
+		},
+	},
+
+	"DeletePage": &graphql.Field{
+		Type:        PageType,
+		Description: "Delete page by slug",
+		Args: graphql.FieldConfigArgument{
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return pages.Delete(p.Context, p.Args)
 		},
 	},
 }

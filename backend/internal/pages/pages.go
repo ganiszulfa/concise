@@ -119,3 +119,25 @@ func Update(ctx context.Context, args map[string]interface{}) (page models.Page,
 
 	return page, result.Error
 }
+
+func Delete(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
+	trace.Func()
+
+	user, ok := users.GetUserFromCtx(ctx)
+	if !ok {
+		return models.Page{}, errors.New("login is required")
+	}
+
+	page, err = GetBySlug(ctx, args)
+	if err != nil {
+		return page, err
+	}
+
+	if user.Id != page.AuthorID {
+		return models.Page{}, errors.New("forbidden")
+	}
+
+	result := app.DB.Delete(&page)
+
+	return page, result.Error
+}

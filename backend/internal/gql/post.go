@@ -90,6 +90,9 @@ var postMutationFields = graphql.Fields{
 		Type:        PostType,
 		Description: "Update post by slug",
 		Args: graphql.FieldConfigArgument{
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"title": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
@@ -99,6 +102,19 @@ var postMutationFields = graphql.Fields{
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return posts.Update(p.Context, p.Args)
+		},
+	},
+
+	"DeletePost": &graphql.Field{
+		Type:        PostType,
+		Description: "Delete post by slug",
+		Args: graphql.FieldConfigArgument{
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return posts.Delete(p.Context, p.Args)
 		},
 	},
 }
