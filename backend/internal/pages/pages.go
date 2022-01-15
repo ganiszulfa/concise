@@ -13,15 +13,41 @@ import (
 
 var errMsgInputInvalid = "input is invalid"
 
-func GetBySlug(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
+func GetById(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
 	trace.Func()
 
-	slug, ok := args["slug"].(string)
+	id, ok := args["id"].(int)
 	if !ok {
 		return models.Page{}, errors.New(errMsgInputInvalid)
 	}
 
-	result := app.DB.WithContext(ctx).First(&page, "slug = ?", slug)
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		isPublished = true
+	}
+
+	if !isPublished {
+		user, ok := users.GetUserFromCtx(ctx)
+		if !ok || !user.IsOwner {
+			isPublished = true
+		}
+	}
+
+	return doGetById(ctx, id, &isPublished)
+}
+
+func doGetById(ctx context.Context, id int, isPublished *bool) (page models.Page, err error) {
+	trace.Func()
+
+	result := app.DB.WithContext(ctx)
+
+	if isPublished != nil {
+		result = result.
+			Where("is_published", isPublished)
+	}
+
+	result = result.First(&page, "id = ?", id)
+
 	return page, result.Error
 }
 
@@ -40,8 +66,21 @@ func GetList(ctx context.Context, args map[string]interface{}) (pages []models.P
 
 	offset := (page - 1) * limit
 
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		isPublished = true
+	}
+
+	if !isPublished {
+		user, ok := users.GetUserFromCtx(ctx)
+		if !ok || !user.IsOwner {
+			isPublished = true
+		}
+	}
+
 	result := app.DB.WithContext(ctx).
 		Limit(limit).Offset(offset).Order(`"order", "title"`).
+		Where(`"is_published"`, isPublished).
 		Preload("Author").Find(&pages)
 
 	return pages, result.Error
@@ -74,12 +113,18 @@ func Create(ctx context.Context, args map[string]interface{}) (page models.Page,
 		return models.Page{}, errors.New(errMsgInputInvalid)
 	}
 
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		return models.Page{}, errors.New(errMsgInputInvalid)
+	}
+
 	page = models.Page{
-		Title:    title,
-		Content:  content,
-		Order:    order,
-		AuthorID: user.Id,
-		Slug:     slug.Make(title),
+		Title:       title,
+		Content:     content,
+		Order:       order,
+		AuthorID:    user.Id,
+		IsPublished: isPublished,
+		Slug:        slug.Make(title),
 	}
 
 	result := app.DB.Create(&page)
@@ -95,7 +140,12 @@ func Update(ctx context.Context, args map[string]interface{}) (page models.Page,
 		return models.Page{}, errors.New("login is required")
 	}
 
-	page, err = GetBySlug(ctx, args)
+	id, ok := args["id"].(int)
+	if !ok {
+		return models.Page{}, errors.New(errMsgInputInvalid)
+	}
+
+	page, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return page, err
 	}
@@ -115,7 +165,25 @@ func Update(ctx context.Context, args map[string]interface{}) (page models.Page,
 		page.Content = content
 	}
 
-	result := app.DB.Model(&page).Updates(page)
+	order, ok := args["order"].(int)
+	if ok {
+		page.Order = order
+	}
+
+	isPublished, ok := args["isPublished"].(bool)
+	if ok {
+		page.IsPublished = isPublished
+	}
+
+	result := app.DB.Model(&page).Updates(
+		map[string]interface{}{
+			"order":        page.Order,
+			"title":        page.Title,
+			"slug":         page.Slug,
+			"content":      page.Content,
+			"is_published": page.IsPublished,
+		},
+	)
 
 	return page, result.Error
 }
@@ -128,7 +196,12 @@ func Delete(ctx context.Context, args map[string]interface{}) (page models.Page,
 		return models.Page{}, errors.New("login is required")
 	}
 
-	page, err = GetBySlug(ctx, args)
+	id, ok := args["id"].(int)
+	if !ok {
+		return models.Page{}, errors.New(errMsgInputInvalid)
+	}
+
+	page, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return page, err
 	}

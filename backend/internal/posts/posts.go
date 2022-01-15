@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/ganiszulfa/concise/backend/config/app"
 	"github.com/ganiszulfa/concise/backend/internal/models"
@@ -15,15 +16,41 @@ import (
 
 var errMsgInputInvalid = "input is invalid"
 
-func GetBySlug(ctx context.Context, args map[string]interface{}) (post models.Post, err error) {
+func GetById(ctx context.Context, args map[string]interface{}) (post models.Post, err error) {
 	trace.Func()
 
-	slug, ok := args["slug"].(string)
+	id, ok := args["id"].(int)
 	if !ok {
 		return models.Post{}, errors.New(errMsgInputInvalid)
 	}
 
-	result := app.DB.WithContext(ctx).First(&post, "slug = ?", slug)
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		isPublished = true
+	}
+
+	if !isPublished {
+		user, ok := users.GetUserFromCtx(ctx)
+		if !ok || !user.IsOwner {
+			isPublished = true
+		}
+	}
+
+	return doGetById(ctx, id, &isPublished)
+}
+
+func doGetById(ctx context.Context, id int, isPublished *bool) (post models.Post, err error) {
+	trace.Func()
+
+	result := app.DB.WithContext(ctx)
+
+	if isPublished != nil {
+		result = result.
+			Where("is_published", isPublished)
+	}
+
+	result = result.First(&post, "id = ?", id)
+
 	return post, result.Error
 }
 
@@ -42,8 +69,21 @@ func GetList(ctx context.Context, args map[string]interface{}) (posts []models.P
 
 	offset := (page - 1) * limit
 
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		isPublished = true
+	}
+
+	if !isPublished {
+		user, ok := users.GetUserFromCtx(ctx)
+		if !ok || !user.IsOwner {
+			isPublished = true
+		}
+	}
+
 	result := app.DB.WithContext(ctx).
 		Limit(limit).Offset(offset).Order(`"created_at" desc`).
+		Where(`"is_published"`, isPublished).
 		Preload("Author").Find(&posts)
 
 	return posts, result.Error
@@ -71,11 +111,21 @@ func Create(ctx context.Context, args map[string]interface{}) (post models.Post,
 		return models.Post{}, errors.New(errMsgInputInvalid)
 	}
 
+	isPublished, ok := args["isPublished"].(bool)
+	if !ok {
+		return models.Post{}, errors.New(errMsgInputInvalid)
+	}
+
 	post = models.Post{
-		Title:    title,
-		Content:  content,
-		AuthorID: user.Id,
-		Slug:     slug.Make(title),
+		Title:       title,
+		Content:     content,
+		AuthorID:    user.Id,
+		IsPublished: isPublished,
+		Slug:        slug.Make(title),
+	}
+
+	if isPublished {
+		post.PublishedAt = time.Now()
 	}
 
 	result := app.DB.Create(&post)
@@ -96,7 +146,12 @@ func Update(ctx context.Context, args map[string]interface{}) (post models.Post,
 		return models.Post{}, errors.New("login is required")
 	}
 
-	post, err = GetBySlug(ctx, args)
+	id, ok := args["id"].(int)
+	if !ok {
+		return models.Post{}, errors.New(errMsgInputInvalid)
+	}
+
+	post, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return post, err
 	}
@@ -116,11 +171,36 @@ func Update(ctx context.Context, args map[string]interface{}) (post models.Post,
 		post.Content = content
 	}
 
-	result := app.DB.Model(&post).Updates(post)
+	isPublished, ok := args["isPublished"].(bool)
+	if ok {
+		post.IsPublished = isPublished
+	}
+
+	if isPublished && post.PublishedAt.IsZero() {
+		post.PublishedAt = time.Now()
+	}
+
+	result := app.DB.Model(&post).Updates(
+		map[string]interface{}{
+			"title":        post.Title,
+			"slug":         post.Slug,
+			"content":      post.Content,
+			"is_published": post.IsPublished,
+			"published_at": post.PublishedAt,
+		},
+	)
 
 	if result.Error != nil {
 		post.Slug = generateSafePostSlug(title)
-		result = app.DB.Model(&post).Updates(post)
+		result = app.DB.Model(&post).Updates(
+			map[string]interface{}{
+				"title":        post.Title,
+				"slug":         post.Slug,
+				"content":      post.Content,
+				"is_published": post.IsPublished,
+				"published_at": post.PublishedAt,
+			},
+		)
 	}
 
 	return post, result.Error
@@ -134,7 +214,12 @@ func Delete(ctx context.Context, args map[string]interface{}) (post models.Post,
 		return models.Post{}, errors.New("login is required")
 	}
 
-	post, err = GetBySlug(ctx, args)
+	id, ok := args["id"].(int)
+	if !ok {
+		return models.Post{}, errors.New(errMsgInputInvalid)
+	}
+
+	post, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return post, err
 	}

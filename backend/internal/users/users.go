@@ -105,6 +105,13 @@ func Create(ctx context.Context, args map[string]interface{}) (user models.User,
 
 	result := app.DB.Create(&user)
 
+	if result.Error == nil {
+		user.Token, err = getTokenForUser(&user)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return user, result.Error
 }
 

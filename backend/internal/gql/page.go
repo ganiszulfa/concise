@@ -23,6 +23,9 @@ var PageType = graphql.NewObject(
 			"updatedAt": &graphql.Field{
 				Type: graphql.DateTime,
 			},
+			"isPublished": &graphql.Field{
+				Type: graphql.Boolean,
+			},
 			"order": &graphql.Field{
 				Type: graphql.Int,
 			},
@@ -45,14 +48,14 @@ var PageType = graphql.NewObject(
 var pageQueryFields = graphql.Fields{
 	"GetPage": &graphql.Field{
 		Type:        PageType,
-		Description: "Get page by slug",
+		Description: "Get page by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return pages.GetBySlug(p.Context, p.Args)
+			return pages.GetById(p.Context, p.Args)
 		},
 	},
 	"ListPage": &graphql.Field{
@@ -64,6 +67,9 @@ var pageQueryFields = graphql.Fields{
 			},
 			"page": &graphql.ArgumentConfig{
 				Type: graphql.Int,
+			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.Boolean,
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -86,6 +92,9 @@ var pageMutationFields = graphql.Fields{
 			"content": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Boolean),
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return pages.Create(p.Context, p.Args)
@@ -94,16 +103,22 @@ var pageMutationFields = graphql.Fields{
 
 	"UpdatePage": &graphql.Field{
 		Type:        PageType,
-		Description: "Update page by slug",
+		Description: "Update page by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 			"title": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 			"content": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
+			},
+			"order": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Boolean),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -113,10 +128,10 @@ var pageMutationFields = graphql.Fields{
 
 	"DeletePage": &graphql.Field{
 		Type:        PageType,
-		Description: "Delete page by slug",
+		Description: "Delete page by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {

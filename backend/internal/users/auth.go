@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/ganiszulfa/concise/backend/internal/models"
@@ -26,6 +27,9 @@ func VerifyTokenAndGetCtx(ctx context.Context, token string) (context.Context, e
 	if token == "" {
 		return ctx, errors.New(ErrMsgTokenEmpty)
 	}
+
+	s := strings.Fields(token)
+	token = s[len(s)-1]
 
 	claims, err := getClaimsFromToken(token)
 	if err != nil {

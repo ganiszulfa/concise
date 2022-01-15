@@ -14,6 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Configuration struct {
@@ -97,8 +98,17 @@ func initDB() {
 		Config.Database.DBName,
 		Config.Database.Port)
 
+	newLogger := logger.New(
+		log.New(),
+		logger.Config{
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
+
 	var err error
-	app.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	app.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
 	if err != nil {
 		panic(err)
 	}

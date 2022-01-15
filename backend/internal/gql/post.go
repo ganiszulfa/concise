@@ -23,6 +23,12 @@ var PostType = graphql.NewObject(
 			"updatedAt": &graphql.Field{
 				Type: graphql.DateTime,
 			},
+			"publishedAt": &graphql.Field{
+				Type: graphql.DateTime,
+			},
+			"isPublished": &graphql.Field{
+				Type: graphql.Boolean,
+			},
 			"slug": &graphql.Field{
 				Type: graphql.String,
 			},
@@ -42,14 +48,14 @@ var PostType = graphql.NewObject(
 var postQueryFields = graphql.Fields{
 	"GetPost": &graphql.Field{
 		Type:        PostType,
-		Description: "Get post by slug",
+		Description: "Get post by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return posts.GetBySlug(p.Context, p.Args)
+			return posts.GetById(p.Context, p.Args)
 		},
 	},
 	"ListPost": &graphql.Field{
@@ -61,6 +67,9 @@ var postQueryFields = graphql.Fields{
 			},
 			"page": &graphql.ArgumentConfig{
 				Type: graphql.Int,
+			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.Boolean,
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -80,6 +89,9 @@ var postMutationFields = graphql.Fields{
 			"content": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Boolean),
+			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			return posts.Create(p.Context, p.Args)
@@ -88,16 +100,19 @@ var postMutationFields = graphql.Fields{
 
 	"UpdatePost": &graphql.Field{
 		Type:        PostType,
-		Description: "Update post by slug",
+		Description: "Update post by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 			"title": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 			"content": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
+			},
+			"isPublished": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Boolean),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -107,10 +122,10 @@ var postMutationFields = graphql.Fields{
 
 	"DeletePost": &graphql.Field{
 		Type:        PostType,
-		Description: "Delete post by slug",
+		Description: "Delete post by id",
 		Args: graphql.FieldConfigArgument{
-			"slug": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
