@@ -9,7 +9,6 @@ import (
 	"github.com/ganiszulfa/concise/backend/config/app"
 	"github.com/ganiszulfa/concise/backend/internal/models"
 	"github.com/ganiszulfa/concise/backend/internal/users"
-	"github.com/ganiszulfa/concise/backend/pkg/inspect"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
 	"github.com/gosimple/slug"
 )
@@ -19,12 +18,12 @@ var errMsgInputInvalid = "input is invalid"
 func GetBySlug(ctx context.Context, args map[string]interface{}) (post models.Post, err error) {
 	trace.Func()
 
-	id, ok := args["slug"].(int)
+	slug, ok := args["slug"].(string)
 	if !ok {
 		return models.Post{}, errors.New(errMsgInputInvalid)
 	}
 
-	result := app.DB.WithContext(ctx).First(&post, "slug = ?", id)
+	result := app.DB.WithContext(ctx).First(&post, "slug = ?", slug)
 	return post, result.Error
 }
 
@@ -75,10 +74,15 @@ func Create(ctx context.Context, args map[string]interface{}) (post models.Post,
 		Title:    title,
 		Content:  content,
 		AuthorID: user.Id,
-		Slug:     generateSlug(title),
+		Slug:     slug.Make(title),
 	}
 
 	result := app.DB.Create(&post)
+
+	if result.Error != nil {
+		post.Slug = generateSafePostSlug(title)
+		result = app.DB.Create(&post)
+	}
 
 	return post, result.Error
 }
@@ -103,7 +107,7 @@ func Update(ctx context.Context, args map[string]interface{}) (post models.Post,
 	title, ok := args["title"].(string)
 	if ok {
 		post.Title = title
-		post.Slug = generateSlug(title)
+		post.Slug = slug.Make(title)
 	}
 
 	content, ok := args["content"].(string)
@@ -111,13 +115,18 @@ func Update(ctx context.Context, args map[string]interface{}) (post models.Post,
 		post.Content = content
 	}
 
-	return models.Post{}, nil
+	result := app.DB.Model(&post).Updates(post)
+
+	if result.Error != nil {
+		post.Slug = generateSafePostSlug(title)
+		result = app.DB.Model(&post).Updates(post)
+	}
+
+	return post, result.Error
 }
 
-func generateSlug(s string) string {
+func generateSafePostSlug(s string) string {
 	i := 10 * 1000
 	r := fmt.Sprintf("_%d", rand.Intn(i*10)+i)
-	x := slug.Make(s) + r
-	inspect.Do(x)
-	return x
+	return slug.Make(s) + r
 }
