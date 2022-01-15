@@ -43,7 +43,8 @@ func GetList(ctx context.Context, args map[string]interface{}) (posts []models.P
 	offset := (page - 1) * limit
 
 	result := app.DB.WithContext(ctx).
-		Limit(limit).Offset(offset).Preload("Author").Find(&posts)
+		Limit(limit).Offset(offset).Order(`"created_at" desc`).
+		Preload("Author").Find(&posts)
 
 	return posts, result.Error
 }

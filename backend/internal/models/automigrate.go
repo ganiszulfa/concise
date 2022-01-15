@@ -9,6 +9,7 @@ func AutoMigrateAllTables(db *gorm.DB) {
 		User{},
 		Metadata{},
 		Post{},
+		Page{},
 	)
 	if err != nil {
 		panic(err)
