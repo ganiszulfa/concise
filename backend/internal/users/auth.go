@@ -90,3 +90,27 @@ func GetUserFromCtx(ctx context.Context) (models.User, bool) {
 	u, ok := ctx.Value(userKey).(models.User)
 	return u, ok
 }
+
+func CheckIfLoggedin(ctx context.Context) (user models.User, err error) {
+	user, ok := GetUserFromCtx(ctx)
+	if !ok {
+		err := errors.New("login is required")
+		return user, err
+	}
+
+	return user, nil
+}
+
+func CheckIfOwner(ctx context.Context) (user models.User, err error) {
+	user, err = CheckIfLoggedin(ctx)
+	if err != nil {
+		return user, err
+	}
+
+	if !user.IsOwner {
+		err := errors.New("forbidden")
+		return user, err
+	}
+
+	return user, nil
+}

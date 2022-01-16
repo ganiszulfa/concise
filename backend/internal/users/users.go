@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ganiszulfa/concise/backend/config/app"
+	"github.com/ganiszulfa/concise/backend/internal/metadata/site"
 	"github.com/ganiszulfa/concise/backend/internal/models"
 	"github.com/ganiszulfa/concise/backend/pkg/pwd"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
@@ -85,7 +86,7 @@ func Create(ctx context.Context, args map[string]interface{}) (user models.User,
 		// to reduce bruteforce
 		time.Sleep(time.Duration(100) * time.Millisecond)
 
-		if ownerPassword != app.OwnerPassword {
+		if ownerPassword != site.GetOwnerPassword(ctx) {
 			return models.User{}, errors.New("invalid owner password")
 		}
 	}

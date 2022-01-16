@@ -5,5 +5,3 @@ import (
 )
 
 var DB *gorm.DB
-
-var OwnerPassword = "1234"

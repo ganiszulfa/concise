@@ -89,33 +89,29 @@ func GetList(ctx context.Context, args map[string]interface{}) (pages []models.P
 func Create(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
 	trace.Func()
 
-	user, ok := users.GetUserFromCtx(ctx)
-	if !ok {
-		return models.Page{}, errors.New("login is required")
-	}
-
-	if !user.IsOwner {
-		return models.Page{}, errors.New("forbidden")
+	user, err := users.CheckIfOwner(ctx)
+	if err != nil {
+		return page, err
 	}
 
 	title, ok := args["title"].(string)
 	if !ok {
-		return models.Page{}, errors.New(errMsgInputInvalid)
+		return page, errors.New(errMsgInputInvalid)
 	}
 
 	content, ok := args["content"].(string)
 	if !ok {
-		return models.Page{}, errors.New(errMsgInputInvalid)
+		return page, errors.New(errMsgInputInvalid)
 	}
 
 	order, ok := args["order"].(int)
 	if !ok {
-		return models.Page{}, errors.New(errMsgInputInvalid)
+		return page, errors.New(errMsgInputInvalid)
 	}
 
 	isPublished, ok := args["isPublished"].(bool)
 	if !ok {
-		return models.Page{}, errors.New(errMsgInputInvalid)
+		return page, errors.New(errMsgInputInvalid)
 	}
 
 	page = models.Page{
@@ -135,23 +131,19 @@ func Create(ctx context.Context, args map[string]interface{}) (page models.Page,
 func Update(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
 	trace.Func()
 
-	user, ok := users.GetUserFromCtx(ctx)
-	if !ok {
-		return models.Page{}, errors.New("login is required")
+	_, err = users.CheckIfOwner(ctx)
+	if err != nil {
+		return page, err
 	}
 
 	id, ok := args["id"].(int)
 	if !ok {
-		return models.Page{}, errors.New(errMsgInputInvalid)
+		return page, errors.New(errMsgInputInvalid)
 	}
 
 	page, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return page, err
-	}
-
-	if user.Id != page.AuthorID {
-		return models.Page{}, errors.New("forbidden")
 	}
 
 	title, ok := args["title"].(string)
@@ -191,9 +183,9 @@ func Update(ctx context.Context, args map[string]interface{}) (page models.Page,
 func Delete(ctx context.Context, args map[string]interface{}) (page models.Page, err error) {
 	trace.Func()
 
-	user, ok := users.GetUserFromCtx(ctx)
-	if !ok {
-		return models.Page{}, errors.New("login is required")
+	_, err = users.CheckIfOwner(ctx)
+	if err != nil {
+		return page, err
 	}
 
 	id, ok := args["id"].(int)
@@ -204,10 +196,6 @@ func Delete(ctx context.Context, args map[string]interface{}) (page models.Page,
 	page, err = doGetById(ctx, id, nil)
 	if err != nil {
 		return page, err
-	}
-
-	if user.Id != page.AuthorID {
-		return models.Page{}, errors.New("forbidden")
 	}
 
 	result := app.DB.Delete(&page)
