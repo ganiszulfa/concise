@@ -1,31 +1,31 @@
 package gql
 
 import (
+	"github.com/ganiszulfa/concise/backend/config/app"
+	"github.com/ganiszulfa/concise/backend/internal/controllers"
+	"github.com/ganiszulfa/concise/backend/internal/repos"
+	"github.com/ganiszulfa/concise/backend/internal/usecases"
 	"github.com/graphql-go/graphql"
 )
 
+var metadataCtr controllers.MetadataCtrInterface
+
 func (g *G) InitializeMetadata() {
-	mutationFieldsList = append(mutationFieldsList, mdMutationFields)
+	r := repos.NewMetadataRepo(app.DB)
+	u := usecases.NewMetadataUc(r)
+	metadataCtr = controllers.NewMetadataCtr(u)
+
 	queryFieldsList = append(queryFieldsList, mdQueryFields)
 }
 
 var MetadataType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "Metadata",
+		Name: controllers.ObjectNameMetadata,
 		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"createdAt": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-			"updatedAt": &graphql.Field{
-				Type: graphql.DateTime,
-			},
-			"key": &graphql.Field{
+			controllers.ArgsMetadataKey: &graphql.Field{
 				Type: graphql.String,
 			},
-			"value": &graphql.Field{
+			controllers.ArgsMetadataValue: &graphql.Field{
 				Type: graphql.String,
 			},
 		},
