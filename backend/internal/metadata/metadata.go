@@ -6,7 +6,6 @@ import (
 
 	"github.com/ganiszulfa/concise/backend/config/app"
 	"github.com/ganiszulfa/concise/backend/internal/models"
-	"github.com/ganiszulfa/concise/backend/internal/users"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
 )
 
@@ -14,11 +13,6 @@ var errMsgInputInvalid = "input is invalid"
 
 func GetById(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
-
-	_, err = users.CheckIfOwner(ctx)
-	if err != nil {
-		return md, err
-	}
 
 	id, ok := args["id"].(int)
 	if !ok {
@@ -32,11 +26,6 @@ func GetById(ctx context.Context, args map[string]interface{}) (md models.Metada
 func GetByKey(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
 
-	_, err = users.CheckIfOwner(ctx)
-	if err != nil {
-		return md, err
-	}
-
 	key, ok := args["key"].(string)
 	if !ok {
 		return md, errors.New(errMsgInputInvalid)
@@ -48,11 +37,6 @@ func GetByKey(ctx context.Context, args map[string]interface{}) (md models.Metad
 
 func GetList(ctx context.Context, args map[string]interface{}) (mds []models.Metadata, err error) {
 	trace.Func()
-
-	_, err = users.CheckIfOwner(ctx)
-	if err != nil {
-		return mds, err
-	}
 
 	page, ok := args["page"].(int)
 	if !ok || page == 0 {
@@ -74,11 +58,6 @@ func GetList(ctx context.Context, args map[string]interface{}) (mds []models.Met
 
 func Create(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
-
-	_, err = users.CheckIfOwner(ctx)
-	if err != nil {
-		return md, err
-	}
 
 	key, ok := args["key"].(string)
 	if !ok {
@@ -102,11 +81,6 @@ func Create(ctx context.Context, args map[string]interface{}) (md models.Metadat
 
 func Update(ctx context.Context, args map[string]interface{}) (md models.Metadata, err error) {
 	trace.Func()
-
-	_, err = users.CheckIfOwner(ctx)
-	if err != nil {
-		return md, err
-	}
 
 	md, err = GetByKey(ctx, args)
 	if err != nil {

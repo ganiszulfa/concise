@@ -24,7 +24,7 @@ __debug_bin
 
 tmp/
 
-config/*.yml
+backend/config/*.yml
 
 .DS_Store
 node_modules
@@ -39,4 +39,4 @@ node_modules
 
 
 # Allow
-!config/example.yml
+!backend/config/example.yml
