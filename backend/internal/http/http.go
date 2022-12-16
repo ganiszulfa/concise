@@ -2,10 +2,8 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
-	"github.com/ganiszulfa/concise/backend/config"
 	"github.com/ganiszulfa/concise/backend/internal/gql"
 	"github.com/ganiszulfa/concise/backend/internal/middleware"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
@@ -42,12 +40,7 @@ func Serve() {
 
 	http.HandleFunc("/gql", middleware.Authorize(gqlHandler))
 
-	if config.Config.HttpServer.Port == "" {
-		log.Warn("http port is not defined, not running the http server...")
-		return
-	}
-
-	address := fmt.Sprintf(":%s", config.Config.HttpServer.Port)
+	address := ":8080"
 	log.Infof("running HTTP server in %s", address)
 	if err := http.ListenAndServe(address, nil); err != nil {
 		log.Error(err)

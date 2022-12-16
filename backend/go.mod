@@ -3,12 +3,13 @@ module github.com/ganiszulfa/concise/backend
 go 1.19
 
 require (
+	github.com/caarlos0/env/v6 v6.10.1
 	github.com/gosimple/slug v1.12.0
 	github.com/graphql-go/graphql v0.8.0
 	github.com/graphql-go/handler v0.2.3
+	github.com/joho/godotenv v1.4.0
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
-	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/postgres v1.2.3
 	gorm.io/gorm v1.22.5
 )

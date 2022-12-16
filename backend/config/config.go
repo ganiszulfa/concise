@@ -5,44 +5,31 @@ import (
 	"os"
 	"time"
 
+	env "github.com/caarlos0/env/v6"
 	"github.com/ganiszulfa/concise/backend/config/app"
 	"github.com/ganiszulfa/concise/backend/internal/gql"
 	"github.com/ganiszulfa/concise/backend/internal/models"
 	"github.com/ganiszulfa/concise/backend/pkg/inspect"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 type Configuration struct {
-	Service struct {
-		Name      string `yaml:"name"`
-		LogLevel  int    `yaml:"loglevel"`
-		DebugMode bool   `yaml:"debug"`
-	} `yaml:"service"`
-	HttpServer struct {
-		Port string `yaml:"port"`
-		Host string `yaml:"host"`
-	} `yaml:"httpserver"`
-	Database struct {
-		Username string `yaml:"user"`
-		Password string `yaml:"pass"`
-		Port     int    `yaml:"port"`
-		Host     string `yaml:"host"`
-		DBName   string `yaml:"db"`
-		LogLevel int    `yaml:"loglevel"`
+	DbUser string `env:"CON_DB_USER"`
+	DbPw   string `env:"CON_DB_PW"`
+	DbPort int    `env:"CON_DB_PORT"`
+	DbHost string `env:"CON_DB_HOST"`
+	DbName string `env:"CON_DB_NAME"`
 
-		MaxIdleConns    int `yaml:"maxidlecon"`
-		MaxOpenConns    int `yaml:"maxopencon"`
-		ConnMaxLifetime int `yaml:"conmaxlifetime"`
-	} `yaml:"database"`
-	Jwt struct {
-		SecretKey string `yaml:"secretkey"`
-		TokenAge  int    `yaml:"age"`
-	} `yaml:"jwt"`
+	DbMaxIdleConns    int `env:"CON_DB_MAX_IDLE_CON" envDefault:"10"`
+	DbMaxOpenConns    int `env:"CON_DB_MAX_OPEN_CON" envDefault:"20"`
+	DbConnMaxLifetime int `env:"CON_DB_CON_MAX_LIFETIME" envDefault:"3600"`
+
+	DebugMode bool `env:"CON_DEBUG_MODE" envDefault:"false"`
 }
 
 var Config Configuration
@@ -59,26 +46,23 @@ func Initialize(env string) {
 	cleanSensitiveConfig()
 }
 
-func setConfig(env string) {
+func setConfig(envName string) {
 	trace.Func()
 
-	confFilePath := fmt.Sprintf("config/%s.yml", env)
-	f, err := os.Open(confFilePath)
-	if err != nil {
-		panic(err)
+	if err := godotenv.Load(".env"); err != nil {
+		log.Info("%+v. Will try to get from ENVs directly\n", err)
 	}
-	defer f.Close()
 
-	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(&Config)
-	if err != nil {
+	if err := env.Parse(&Config); err != nil {
+		fmt.Printf("%+v\n", err)
 		panic(err)
 	}
 
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.Level(Config.Service.LogLevel))
+	log.SetLevel(log.WarnLevel)
 
-	if Config.Service.DebugMode {
+	if Config.DebugMode {
+		log.SetLevel(log.TraceLevel)
 		inspect.Do(Config)
 	}
 
@@ -87,16 +71,17 @@ func setConfig(env string) {
 func initDB() {
 	trace.Func()
 
-	if Config.Database.Host == "" || Config.Database.Username == "" {
+	if Config.DbHost == "" || Config.DbUser == "" {
 		panic("no setup for database")
 	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		Config.Database.Host,
-		Config.Database.Username,
-		Config.Database.Password,
-		Config.Database.DBName,
-		Config.Database.Port)
+		Config.DbHost,
+		Config.DbUser,
+		Config.DbPw,
+		Config.DbName,
+		Config.DbPort,
+	)
 
 	newLogger := logger.New(
 		log.New(),
@@ -119,11 +104,11 @@ func initDB() {
 	}
 
 	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
-	sqlDB.SetMaxIdleConns(Config.Database.MaxIdleConns)
+	sqlDB.SetMaxIdleConns(Config.DbMaxIdleConns)
 	// SetMaxOpenConns sets the maximum number of open connections to the database.
-	sqlDB.SetMaxOpenConns(Config.Database.MaxOpenConns)
+	sqlDB.SetMaxOpenConns(Config.DbMaxOpenConns)
 	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
-	sqlDB.SetConnMaxLifetime(time.Duration(Config.Database.ConnMaxLifetime) * time.Second)
+	sqlDB.SetConnMaxLifetime(time.Duration(Config.DbConnMaxLifetime) * time.Second)
 
 	models.AutoMigrateAllTables(app.DB)
 }
@@ -135,6 +120,7 @@ func cleanSensitiveConfig() {
 	// to create connection to respective service
 	log.Info("Cleaning sensitive data in config..")
 	s := "CLEANED"
-	Config.Database.Username = s
-	Config.Database.Password = s
+	Config.DbUser = s
+	Config.DbHost = s
+	Config.DbPw = s
 }
