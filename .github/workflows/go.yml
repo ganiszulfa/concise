@@ -20,14 +20,11 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Build
+    - name: Build and test
       run: |
         cd ./backend
+        go mod tidy
         go build -v ./...
-
-    - name: Test
-      run: |
-        cd ./backend
         go test -v ./...
 
     - uses: a7ul/tar-action@v1.1.0

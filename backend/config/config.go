@@ -50,7 +50,7 @@ func setConfig(envName string) {
 	trace.Func()
 
 	if err := godotenv.Load(".env"); err != nil {
-		log.Info("%+v. Will try to get from ENVs directly\n", err)
+		log.Infof("%+v. Will try to get from ENVs directly\n", err)
 	}
 
 	if err := env.Parse(&Config); err != nil {
