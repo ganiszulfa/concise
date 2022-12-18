@@ -22,13 +22,14 @@ jobs:
 
     - name: Build
       run: |
-        - cd ./backend
-        - go build -v ./...
+        cd ./backend
+        go build -v ./...
 
     - name: Test
       run: |
-        - cd ./backend
-        - go test -v ./...
+        cd ./backend
+        go test -v ./...
+
     - uses: a7ul/tar-action@v1.1.0
       with:
         command: c
