@@ -3,6 +3,13 @@
 
 name: Go
 
+env:
+    CONTEXT_DIR: './'
+    IMAGE_NAME: ${{ github.repository }}/backend
+    DOCKERFILE: backend.Dockerfile
+    CAPROVER_APP: concise
+    DOCKER_REGISTRY: ghcr.io
+
 on:
   push:
     tags:
@@ -10,10 +17,14 @@ on:
 
 jobs:
 
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - run: |
+        echo "IMAGE_NAME_WITH_REGISTRY=$DOCKER_REGISTRY/$IMAGE_NAME" >> $GITHUB_ENV
+        export IMAGE_NAME_WITH_REGISTRY=$DOCKER_REGISTRY/$IMAGE_NAME
+        echo "FULL_IMAGE_NAME=$IMAGE_NAME_WITH_REGISTRY:$GITHUB_SHA-gitsha" >> $GITHUB_ENV
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -27,15 +38,16 @@ jobs:
         go build -v ./...
         go test -v ./...
 
-    - uses: a7ul/tar-action@v1.1.0
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
       with:
-        command: c
-        cwd: "./"
-        files: |
-          ./backend
-          ./backend/captain-definition
-          ./backend/Dockerfile
-        outPath: deploy.tar
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and Push Release to DockerHub
+      shell: bash
+      run: ./build_and_push.sh
       
     - name: Deploy App to CapRover
       uses: caprover/deploy-from-github@v1.0.1
@@ -43,4 +55,5 @@ jobs:
         server: '${{ secrets.CAPROVER_SERVER }}'
         app: '${{ secrets.APP_NAME }}'
         token: '${{ secrets.APP_TOKEN }}'
+        image: '${{ env.FULL_IMAGE_NAME }}'
 

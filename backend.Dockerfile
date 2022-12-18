@@ -4,12 +4,12 @@ FROM golang:1.19-alpine
 # install dependencies
 RUN mkdir -p /app
 WORKDIR /app
-COPY ./go.mod /app
-COPY ./go.sum /app
+COPY ./backend/go.mod /app
+COPY ./backend/go.sum /app
 RUN go mod download
 
 # Copy all local files into the image.
-COPY ./ /app
+COPY ./backend /app
 
 RUN go build -o /backend
 
