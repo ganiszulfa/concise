@@ -8,7 +8,7 @@ import (
 	env "github.com/caarlos0/env/v6"
 	"github.com/ganiszulfa/concise/backend/config/app"
 	"github.com/ganiszulfa/concise/backend/internal/gql"
-	"github.com/ganiszulfa/concise/backend/internal/models"
+	"github.com/ganiszulfa/concise/backend/internal/models/migrations"
 	"github.com/ganiszulfa/concise/backend/pkg/inspect"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
 	"github.com/joho/godotenv"
@@ -110,7 +110,10 @@ func initDB() {
 	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 	sqlDB.SetConnMaxLifetime(time.Duration(Config.DbConnMaxLifetime) * time.Second)
 
-	models.AutoMigrateAllTables(app.DB)
+	err = migrations.Migrate(app.DB)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func cleanSensitiveConfig() {
