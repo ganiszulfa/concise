@@ -3,6 +3,10 @@ package http
 import (
 	"context"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/ganiszulfa/concise/backend/internal/gql"
 	"github.com/ganiszulfa/concise/backend/internal/middleware"
@@ -41,10 +45,31 @@ func Serve() {
 	http.HandleFunc("/gql", middleware.Authorize(gqlHandler))
 
 	address := ":8080"
-	log.Infof("running HTTP server in %s", address)
-	if err := http.ListenAndServe(address, nil); err != nil {
-		log.Error(err)
+	srv := &http.Server{
+		Addr:    address,
+		Handler: http.DefaultServeMux,
 	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	log.Infof("running HTTP server in localhost%s", address)
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Error(err)
+		}
+	}()
+
+	<-done
+	log.Info("HTTP server is shutting down..")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %+v", err)
+	}
+	log.Info("Server shutdown properly.")
 }
 
 func resultCallback(
