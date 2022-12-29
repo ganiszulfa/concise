@@ -8,7 +8,7 @@ var CreateMetadataTableSQLUp = `
 	 );
 `
 
-func (m *Migrators) CreateMetadataTable() {
+func (m *Migrators) createMetadataTable() {
 	key := "CreateMetadataTable"
 	err := runMigration(m, CreateMetadataTableSQLUp, key)
 	if err != nil {

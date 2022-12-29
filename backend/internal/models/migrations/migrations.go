@@ -24,8 +24,9 @@ func Migrate(db *gorm.DB) (err error) {
 	}
 
 	// PUT THE MIGRATION SCRIPTS HERE
-	migrator.CreateMetadataTable()
-	migrator.CreatePostsTable()
+	migrator.createMetadataTable()
+	migrator.createPostsTable()
+	migrator.initMetadata()
 
 	return
 }

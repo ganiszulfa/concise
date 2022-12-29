@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ganiszulfa/concise/backend/internal/models"
+	"github.com/ganiszulfa/concise/backend/internal/models/keys"
 	"github.com/ganiszulfa/concise/backend/internal/repos"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
 )
@@ -25,6 +26,11 @@ func (u MetadataUc) GetAll(ctx context.Context) (mds []models.Metadata, err erro
 	trace.Func()
 
 	mds, err = u.metadataRepo.GetAll(ctx)
+	for i, v := range mds {
+		if v.Key == keys.KEY_USER_PASSWORD {
+			mds[i].Value = ""
+		}
+	}
 
 	return
 }

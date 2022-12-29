@@ -24,7 +24,7 @@ func getByKey(ctx context.Context, key string) (string, error) {
 func GetOwnerPassword(ctx context.Context) string {
 	trace.Func()
 
-	v, err := getByKey(ctx, keys.KEY_OWNER_PASSWORD)
+	v, err := getByKey(ctx, keys.KEY_USER_PASSWORD)
 	if err != nil {
 		log.Error(err)
 		return "default"

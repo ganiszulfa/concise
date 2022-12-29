@@ -15,7 +15,7 @@ var CreatePostsTableSQLUp = `
 	 );
 `
 
-func (m *Migrators) CreatePostsTable() {
+func (m *Migrators) createPostsTable() {
 	key := "CreatePostsTable"
 	err := runMigration(m, CreatePostsTableSQLUp, key)
 	if err != nil {
