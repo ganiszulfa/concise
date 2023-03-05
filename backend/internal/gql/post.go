@@ -23,6 +23,9 @@ var PostType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: controllers.ObjectNamePost,
 		Fields: graphql.Fields{
+			controllers.ArgsId: &graphql.Field{
+				Type: graphql.Int,
+			},
 			controllers.ArgsCreatedAt: &graphql.Field{
 				Type: graphql.DateTime,
 			},

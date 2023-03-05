@@ -20,6 +20,7 @@ const (
 const (
 	ArgsPostsTitle       = "title"
 	ArgsPostsContent     = "content"
+	ArgsPostsId          = "id"
 	ArgsPostsSlug        = "slug"
 	ArgsPostsIsPublished = "isPublished"
 	ArgsPostsIsPage      = "isPage"

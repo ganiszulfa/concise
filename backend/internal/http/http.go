@@ -42,7 +42,7 @@ func Serve() {
 
 	http.HandleFunc("/health", healthHandler)
 
-	http.HandleFunc("/gql", middleware.Authorize(gqlHandler))
+	http.HandleFunc("/graphql", middleware.Authorize(gqlHandler))
 
 	address := ":8080"
 	srv := &http.Server{

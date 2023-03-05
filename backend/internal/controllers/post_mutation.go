@@ -38,6 +38,12 @@ func (c PostCtr) CreateFromGQL(ctx context.Context, args map[string]interface{})
 func (c PostCtr) UpdateFromGQL(ctx context.Context, args map[string]interface{}) (post models.Post, err error) {
 	trace.Func()
 
+	id, ok := args[ArgsPostsId].(int)
+	if !ok {
+		err = errInputInvalid
+		return
+	}
+
 	slug, ok := args[ArgsPostsSlug].(string)
 	if !ok {
 		err = errInputInvalid
@@ -61,7 +67,7 @@ func (c PostCtr) UpdateFromGQL(ctx context.Context, args map[string]interface{})
 		isPublished = true
 	}
 
-	return c.postUc.Update(ctx, slug, title, content, isPublished)
+	return c.postUc.Update(ctx, id, slug, title, content, isPublished)
 }
 
 func (c PostCtr) DeleteFromGQL(ctx context.Context, args map[string]interface{}) (err error) {

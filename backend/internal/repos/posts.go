@@ -14,6 +14,7 @@ import (
 )
 
 type PostRepoInterface interface {
+	GetById(ctx context.Context, id int, isPublished *bool) (post models.Post, err error)
 	GetBySlug(ctx context.Context, slug string, isPublished *bool) (post models.Post, err error)
 	GetList(ctx context.Context, limit, offset int, isPage, isPublished *bool) (posts []models.Post, err error)
 
@@ -28,6 +29,24 @@ type PostRepo struct {
 
 func NewPostRepo(db *gorm.DB) PostRepoInterface {
 	return &PostRepo{db: db}
+}
+
+func (r PostRepo) GetById(ctx context.Context, id int, isPublished *bool) (post models.Post, err error) {
+	trace.Func()
+
+	result := r.db.WithContext(ctx)
+
+	if isPublished != nil {
+		result = result.
+			Where("is_published", isPublished)
+	}
+
+	result = result.
+		Where("is_deleted", false)
+
+	result = result.First(&post, "id = ?", id)
+
+	return post, result.Error
 }
 
 func (r PostRepo) GetBySlug(ctx context.Context, slug string, isPublished *bool) (post models.Post, err error) {
@@ -105,9 +124,10 @@ func (r PostRepo) Update(ctx context.Context, post *models.Post) (err error) {
 	}
 
 	err = app.DB.Model(post).
-		Where("slug = ?", post.Slug).
+		Where("id = ?", post.Id).
 		Updates(
 			map[string]interface{}{
+				"slug":         post.Slug,
 				"title":        post.Title,
 				"content":      post.Content,
 				"is_published": post.IsPublished,

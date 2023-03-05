@@ -30,10 +30,13 @@ var postMutationFields = graphql.Fields{
 
 	controllers.PostMutationUpdate: &graphql.Field{
 		Type:        PostType,
-		Description: "Update a post by slug",
+		Description: "Update a post by id",
 		Args: graphql.FieldConfigArgument{
+			controllers.ArgsPostsId: &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
 			controllers.ArgsPostsSlug: &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+				Type: graphql.String,
 			},
 			controllers.ArgsPostsTitle: &graphql.ArgumentConfig{
 				Type: graphql.String,
