@@ -17,11 +17,13 @@ type PostUcInterface interface {
 }
 
 type PostUc struct {
-	postRepo repos.PostRepoInterface
+	postRepo        repos.PostRepoInterface
+	AuthorizationUc AuthorizationUcInterface
 }
 
-func NewPostUc(postRepo repos.PostRepoInterface) PostUcInterface {
-	return &PostUc{postRepo: postRepo}
+func NewPostUc(postRepo repos.PostRepoInterface,
+	authoAuthorizationUc AuthorizationUcInterface) PostUcInterface {
+	return &PostUc{postRepo: postRepo, AuthorizationUc: authoAuthorizationUc}
 }
 
 func (u PostUc) GetBySlug(ctx context.Context, slug string, isPublished *bool) (post models.Post, err error) {
@@ -41,6 +43,11 @@ func (u PostUc) GetList(ctx context.Context, limit, offset int, isPage, isPublis
 func (u PostUc) Create(ctx context.Context, title, content string, isPage, isPublished bool) (post models.Post, err error) {
 
 	trace.Func()
+
+	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	if err != nil {
+		return
+	}
 
 	post = models.Post{
 		Title:       title,
@@ -62,6 +69,10 @@ func (u PostUc) Update(ctx context.Context,
 
 	trace.Func()
 
+	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	if err != nil {
+		return
+	}
 	postInDB, err := u.postRepo.GetById(ctx, id, nil)
 	if err != nil {
 		return
@@ -97,6 +108,10 @@ func (u PostUc) Delete(ctx context.Context, slug string) (err error) {
 
 	trace.Func()
 
+	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	if err != nil {
+		return
+	}
 	err = u.postRepo.Delete(ctx, slug)
 
 	return

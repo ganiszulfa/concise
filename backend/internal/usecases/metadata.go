@@ -26,6 +26,10 @@ func (u MetadataUc) GetAll(ctx context.Context) (mds []models.Metadata, err erro
 	trace.Func()
 
 	mds, err = u.metadataRepo.GetAll(ctx)
+	if err != nil {
+		return
+	}
+
 	for i, v := range mds {
 		if v.Key == keys.KEY_USER_PASSWORD {
 			mds[i].Value = ""

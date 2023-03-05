@@ -12,7 +12,11 @@ var postCtr controllers.PostCtrInterface
 
 func (g *G) InitializePost() {
 	pr := repos.NewPostRepo(app.DB)
-	pu := usecases.NewPostUc(pr)
+	mr := repos.NewMetadataRepo(app.DB)
+
+	au := usecases.NewAuthorizationUc(mr)
+	pu := usecases.NewPostUc(pr, au)
+
 	postCtr = controllers.NewPostCtr(pu)
 
 	mutationFieldsList = append(mutationFieldsList, postMutationFields)

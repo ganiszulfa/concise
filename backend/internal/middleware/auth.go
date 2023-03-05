@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
@@ -9,7 +10,7 @@ import (
 func Authorize(nextHandler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		trace.Func()
-
-		nextHandler(w, r.WithContext(r.Context()))
+		ctx := context.WithValue(r.Context(), "User-Password", r.Header.Get("User-Password"))
+		nextHandler(w, r.WithContext(ctx))
 	}
 }

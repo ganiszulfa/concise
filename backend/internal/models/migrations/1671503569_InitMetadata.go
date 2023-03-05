@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ganiszulfa/concise/backend/pkg/generate"
-	"github.com/sirupsen/logrus"
 )
 
 var InitMetadataSQLUp = `
@@ -25,6 +24,4 @@ func (m *Migrators) initMetadata() {
 	if err != nil {
 		panic(err)
 	}
-
-	logrus.Infof("Your user password is %s", pwd)
 }
