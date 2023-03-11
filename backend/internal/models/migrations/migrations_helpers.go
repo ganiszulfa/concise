@@ -42,7 +42,7 @@ func create(m *Migrators, key string) (err error) {
 	return
 }
 
-func runMigration(m *Migrators, sql, key string) (err error) {
+func runMigration(m *Migrators, sql, key string) (isRun bool, err error) {
 
 	if isExist(m, key) {
 		return
@@ -56,5 +56,7 @@ func runMigration(m *Migrators, sql, key string) (err error) {
 	if err := create(m, key); err != nil {
 		panic(err)
 	}
+
+	isRun = true
 	return
 }

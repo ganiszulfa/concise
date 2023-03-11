@@ -10,7 +10,7 @@ var CreateMetadataTableSQLUp = `
 
 func (m *Migrators) createMetadataTable() {
 	key := "CreateMetadataTable"
-	err := runMigration(m, CreateMetadataTableSQLUp, key)
+	_, err := runMigration(m, CreateMetadataTableSQLUp, key)
 	if err != nil {
 		panic(err)
 	}

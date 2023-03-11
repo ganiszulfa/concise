@@ -17,7 +17,7 @@ var CreatePostsTableSQLUp = `
 
 func (m *Migrators) createPostsTable() {
 	key := "CreatePostsTable"
-	err := runMigration(m, CreatePostsTableSQLUp, key)
+	_, err := runMigration(m, CreatePostsTableSQLUp, key)
 	if err != nil {
 		panic(err)
 	}
