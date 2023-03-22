@@ -36,6 +36,7 @@ node_modules
 !.env.example
 .vercel
 .output
+.Identifier
 
 
 # Allow
