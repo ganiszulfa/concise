@@ -1,7 +1,5 @@
 <script>
 	export let siteName, pages;
-
-	console.log(siteName);
 </script>
 
 <header>

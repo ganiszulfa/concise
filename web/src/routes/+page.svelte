@@ -1,32 +1,46 @@
 <script>
-	export let data, siteName, siteTagline;
-
+	export let data;
 </script>
 
 <svelte:head>
-	<title>{siteName} - {siteTagline}</title>
+	<title>{data.siteName} - {data.siteTagline} - Home</title>
 	<meta
 		name="description"
-		content="{siteTagline}"
+		content="{data.siteTagline}"
 	/>
 </svelte:head>
 
 <section>
 	{#each data.posts as post}
-	<div class="card w-auto bg-neutral text-primary-content shadow-xl my-4">
+	<div class="w-auto shadow-xl my-4">
 		<div class="card-body">
-		  <h2 class="card-title">{post.title}</h2>
-		  <p>If a dog chews shoes whose shoes does he choose?</p>
-		  <div class="card-actions justify-end">
-			<a class="btn btn-primary" href="/{post.slug}">Read More</a>
-		  </div>
+		  <h2 class="card-title">
+			<a href="/{post.slug}">{post.title}</a>
+		  </h2>
+		  <p>{(new Date(post.publishedAt)).toDateString()}</p>
 		</div>
 	</div>
 	{:else}
-		<h1>No posts</h1>
+	<div class="text-center my-10">
+		<h1>No More Posts...</h1>
+	</div>
 	{/each}
-	<ul>
-	</ul>
+
+	<div class="btn-group my-8 flex justify-center">
+		{#if data.page <= 1}
+			<span class="btn btn-disabled">Prev</span>
+		{/if}
+		{#if data.page > 1}
+			<a href="/?p={(data.page-1)}" class="btn">Prev</a>
+		{/if}
+
+		{#if data.posts.length > 0}
+			<a href="/?p={(data.page+1)}" class="btn">Next</a>
+		{/if}
+		{#if data.posts.length <= 0}
+			<span class="btn btn-disabled">Next</span>
+		{/if}
+	</div>
 </section>
 
 <style>

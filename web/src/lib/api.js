@@ -40,3 +40,17 @@ export async function GetPageTitles() {
 
     return [];
 }
+
+export async function GetAPost(slug) {
+
+    var query = "query ($slug: String!) {\r\n  GetPost(slug: $slug) {\r\n    title\r\n    content\r\n    createdAt\r\n    updatedAt\r\n    publishedAt\r\n    slug\r\n    isPublished\r\n    isPage\r\n  }\r\n}\r\n"
+    var variables = { "slug": slug };
+
+    var Data = await GraphQLQuery(query, variables);
+
+    if (Data != null) {
+        return Data.GetPost;
+    }
+
+    return [];
+}

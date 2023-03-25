@@ -14,7 +14,7 @@
 <Header siteName={data.siteName} pages={data.pages}/>
 
 <main>
-	<div class="container mx-auto p-6">
+	<div class="container mx-auto p-1 max-w-screen-md">
 		<slot />
 	</div>
 </main>
@@ -25,6 +25,9 @@
   <div class="drawer-side">
     <label for="my-drawer-3" class="drawer-overlay"></label> 
     <ul class="menu p-4 w-80 bg-base-100">
+  		<li class="text-xl mb-2">{data.siteName}</li>
+  		<li class="text-m my-2">{data.siteTagline}</li>
+  		<li><a href="/">Home</a></li>
 		{#each data.pages as page}
   			<li><a href="/{page.slug}">{page.title}</a></li>
 		{/each}
