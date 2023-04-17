@@ -3,8 +3,8 @@ package usecases
 import (
 	"context"
 	"errors"
+	"time"
 
-	"github.com/ganiszulfa/concise/backend/internal/models/keys"
 	"github.com/ganiszulfa/concise/backend/internal/repos"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
 )
@@ -13,38 +13,36 @@ type AuthorizationUcInterface interface {
 	AuthorizeUser(ctx context.Context) (err error)
 }
 
-func NewAuthorizationUc(metadataRepo repos.MetadataRepoInterface) AuthorizationUcInterface {
-	return &AuthorizationUc{metadataRepo: metadataRepo}
+func NewAuthorizationUc(
+	sessionRepo repos.SessionRepoInterface,
+) AuthorizationUcInterface {
+
+	return &AuthorizationUc{
+		sessionRepo: sessionRepo,
+	}
 }
 
 type AuthorizationUc struct {
-	metadataRepo repos.MetadataRepoInterface
+	sessionRepo repos.SessionRepoInterface
 }
 
 func (u AuthorizationUc) AuthorizeUser(ctx context.Context) (err error) {
 
 	trace.Func()
 
-	password, ok := ctx.Value("User-Password").(string)
+	sessionId, ok := ctx.Value("SessionId").(string)
 
-	if !ok || password == "" {
-		return errors.New("empty password")
+	if !ok || sessionId == "" {
+		return errors.New("empty session id")
 	}
 
-	mds, err := u.metadataRepo.GetAll(ctx)
+	session, err := u.sessionRepo.GetById(ctx, sessionId)
 	if err != nil {
 		return
 	}
-
-	for _, v := range mds {
-		if v.Key == keys.KEY_USER_PASSWORD {
-			if password == v.Value {
-				return nil
-			} else {
-				return errors.New("invalid password")
-			}
-		}
+	if session.ExpiredAt.Before(time.Now()) {
+		return errors.New("session expired")
 	}
 
-	return errors.New("password key not found, invalid setup")
+	return nil
 }

@@ -3,8 +3,7 @@ package migrations
 import (
 	"fmt"
 
-	"github.com/ganiszulfa/concise/backend/pkg/generate"
-	"github.com/sirupsen/logrus"
+	"github.com/ganiszulfa/concise/backend/internal/models/keys"
 )
 
 var InitMetadataSQLUp = `
@@ -19,13 +18,9 @@ VALUES
 
 func (m *Migrators) initMetadata() {
 	key := "InitMetadata"
-	pwd := generate.RandAlphabetsLowerCase(24)
-	sql := fmt.Sprintf(InitMetadataSQLUp, pwd)
-	isRun, err := runMigration(m, sql, key)
+	sql := fmt.Sprintf(InitMetadataSQLUp, keys.KEY_DEFAULT_VALUE)
+	_, err := runMigration(m, sql, key)
 	if err != nil {
 		panic(err)
-	}
-	if isRun {
-		logrus.Infof("Your user password is %s", pwd)
 	}
 }

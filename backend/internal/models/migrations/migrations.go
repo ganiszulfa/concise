@@ -27,6 +27,9 @@ func Migrate(db *gorm.DB) (err error) {
 	migrator.createMetadataTable()
 	migrator.createPostsTable()
 	migrator.initMetadata()
+	migrator.initMetadata2()
+	migrator.resetPassword()
+	migrator.createSessionTable()
 
 	return
 }

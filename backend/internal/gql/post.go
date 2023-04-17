@@ -12,9 +12,9 @@ var postCtr controllers.PostCtrInterface
 
 func (g *G) InitializePost() {
 	pr := repos.NewPostRepo(app.DB)
-	mr := repos.NewMetadataRepo(app.DB)
+	sr := repos.NewSessionRepo(app.DB)
 
-	au := usecases.NewAuthorizationUc(mr)
+	au := usecases.NewAuthorizationUc(sr)
 	pu := usecases.NewPostUc(pr, au)
 
 	postCtr = controllers.NewPostCtr(pu)

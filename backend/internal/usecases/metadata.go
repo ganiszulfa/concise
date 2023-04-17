@@ -11,6 +11,7 @@ import (
 
 type MetadataUcInterface interface {
 	GetAll(ctx context.Context) (mds []models.Metadata, err error)
+	GetByKey(ctx context.Context, key string) (md models.Metadata, err error)
 }
 
 type MetadataUc struct {
@@ -36,5 +37,13 @@ func (u MetadataUc) GetAll(ctx context.Context) (mds []models.Metadata, err erro
 		}
 	}
 
+	return
+}
+
+func (u MetadataUc) GetByKey(ctx context.Context, key string) (md models.Metadata, err error) {
+
+	trace.Func()
+
+	md, err = u.metadataRepo.GetByKey(ctx, key)
 	return
 }

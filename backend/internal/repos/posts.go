@@ -106,6 +106,7 @@ func (r PostRepo) Create(ctx context.Context, post *models.Post) (err error) {
 
 	if err != nil {
 		// retry again
+		// todo: improve this
 		post.Slug = generateSafePostSlug(post.Title)
 		err = r.db.Create(post).Error
 	}
