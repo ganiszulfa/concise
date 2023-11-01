@@ -33,7 +33,7 @@ While this project is a work in progress, I'm currently exploring ways to involv
 
 ## Licenses
 
-This project is licensed under the Apache License 2.0.
+This project is licensed under the MIT License.
 
 ## Who uses Concise?
 
