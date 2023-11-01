@@ -3,13 +3,12 @@ export const prerender = true;
 import { GetPosts } from '$lib/api';
 
 export const load = async ({ url }) => {
+	var paramPage = url.searchParams.get('p');
+	var page = paramPage ? parseInt(paramPage) : 1;
+	var Posts = await GetPosts(page);
 
-    var paramPage = url.searchParams.get("p");
-    var page = paramPage? parseInt(paramPage): 1;
-    var Posts = await GetPosts(page);
-
-    return {
-        posts: Posts,
-        page: page,
-    }
+	return {
+		posts: Posts,
+		page: page
+	};
 };

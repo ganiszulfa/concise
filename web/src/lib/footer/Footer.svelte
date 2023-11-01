@@ -1,9 +1,9 @@
 <script>
 	export let siteTagline;
 
-	let now = new Date(), year;
+	let now = new Date(),
+		year;
 	year = now.getFullYear();
-
 </script>
 
 <footer class="footer footer-center p-10 bg-neutral text-neutral-content">
