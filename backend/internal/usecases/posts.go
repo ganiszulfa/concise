@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 
+	"github.com/ganiszulfa/concise/backend/internal/helpers"
 	"github.com/ganiszulfa/concise/backend/internal/models"
 	"github.com/ganiszulfa/concise/backend/internal/repos"
 	"github.com/ganiszulfa/concise/backend/pkg/trace"
@@ -17,13 +18,13 @@ type PostUcInterface interface {
 }
 
 type PostUc struct {
-	postRepo        repos.PostRepoInterface
-	AuthorizationUc AuthorizationUcInterface
+	postRepo repos.PostRepoInterface
+	UserUc   UserUcInterface
 }
 
 func NewPostUc(postRepo repos.PostRepoInterface,
-	authoAuthorizationUc AuthorizationUcInterface) PostUcInterface {
-	return &PostUc{postRepo: postRepo, AuthorizationUc: authoAuthorizationUc}
+	userUc UserUcInterface) PostUcInterface {
+	return &PostUc{postRepo: postRepo, UserUc: userUc}
 }
 
 func (u PostUc) GetBySlug(ctx context.Context, slug string, isPublished *bool) (post models.Post, err error) {
@@ -44,7 +45,7 @@ func (u PostUc) Create(ctx context.Context, title, content string, isPage, isPub
 
 	trace.Func()
 
-	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	_, err = helpers.IsAdmin(ctx)
 	if err != nil {
 		return
 	}
@@ -69,7 +70,7 @@ func (u PostUc) Update(ctx context.Context,
 
 	trace.Func()
 
-	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	_, err = helpers.IsAdmin(ctx)
 	if err != nil {
 		return
 	}
@@ -108,7 +109,7 @@ func (u PostUc) Delete(ctx context.Context, slug string) (err error) {
 
 	trace.Func()
 
-	err = u.AuthorizationUc.AuthorizeUser(ctx)
+	_, err = helpers.IsAdmin(ctx)
 	if err != nil {
 		return
 	}

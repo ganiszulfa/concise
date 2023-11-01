@@ -47,3 +47,16 @@ func (u MetadataUc) GetByKey(ctx context.Context, key string) (md models.Metadat
 	md, err = u.metadataRepo.GetByKey(ctx, key)
 	return
 }
+
+func (u MetadataUc) UpdateByKey(ctx context.Context, key, value string) (md models.Metadata, err error) {
+
+	trace.Func()
+
+	md = models.Metadata{
+		Key:   key,
+		Value: value,
+	}
+
+	err = u.metadataRepo.UpdateByKey(ctx, md)
+	return
+}
